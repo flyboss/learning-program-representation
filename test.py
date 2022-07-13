@@ -11,12 +11,12 @@ name = "EmpStudy[Test]"
 
 
 def main(args):
-    torch_setup(args.gpu_id, name)
+    torch_setup(args.gpu_id)
     config = Config(args.config_path, test_mode=True)
     config.print_params()
     config.class_weight = False
     config.evaluate = args.evaluate
-    config.output_path = os.path.join(config.output_path, args.config_path.split(os.sep)[-2])
+    # config.output_path = os.path.join(config.output_path, args.config_path.split(os.sep)[-2])
     vector_type = args.vector_type
     config.setup_vocab_dict()
     test(config, vector_type)
@@ -35,8 +35,8 @@ def test(config, vector_type=""):
     if config.model_type in [ModelType.XGBoost, ModelType.SVM, ModelType.NaiveBayes]:
         return
 
-    dataset = DatasetFactory().get_dataset(config)(config, test_mode=True)
-    trainer = TrainerFactory().get_trainer(config)(config)
+    dataset = DatasetFactory().get_dataset(config, running_mode='test')
+    trainer = TrainerFactory().get_trainer(config)
     print_msg("Using Trainer %s" % trainer.name, name=name)
     print_msg("Using Dataset %s" % dataset.name, name=name)
 

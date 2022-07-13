@@ -7,7 +7,7 @@ class DatasetFactory:
     name = "DatasetFactory"
 
     @staticmethod
-    def get_dataset(config):
+    def get_dataset(config,running_mode='train'):
         """
         Factory Function to retrieve the necessary dataloader object
         A specific dataloader for a dataset
@@ -22,7 +22,7 @@ class DatasetFactory:
         elif dataset_name == "devign":
             dataloader = Devign(config)
         elif dataset_name == "poj104clone":
-            dataloader = POJ104Clone(config)
+            dataloader = POJ104Clone(config,running_mode=running_mode)
         else:
             raise SystemExit(Exception("Dataset Name %s is not found." % dataset_name))
         return dataloader

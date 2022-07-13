@@ -17,7 +17,7 @@ class Config:
         # Essential Configuration that cannot be missed.
         self.output_path = ""
         self.save_output = True
-        self.test_mode = False
+        self.test_mode = test_mode
         check_if_path_exists(yaml_config_path)
         with open(yaml_config_path) as f:
             # use safe_load instead load

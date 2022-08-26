@@ -7,7 +7,7 @@ import torch.nn as nn
 import numpy as np
 from bases.base_trainer import BaseTrainer
 from utils.pymodels_util import get_average
-from utils.util import get_pretty_metric, save_json
+from utils.util import get_pretty_metric, save_json, print_msg
 from evaluation.evaluator.classification_evaluator import ClassificationEvaluator
 
 
@@ -157,7 +157,7 @@ class SequenceTrainer(BaseTrainer):
             fn = item['function']
             if pred != target: #len(fn.splitlines()) < 10:
                 count += 1
-        self.print_msg("Total: %i" % count)
+        print_msg("Total: %i" % count)
         return scores
 
     def get_vectors(self, dataset, vector_type="train"):
@@ -169,7 +169,7 @@ class SequenceTrainer(BaseTrainer):
         """
         running_mode = "test"
         dl = dataset.get_testing_dl() if vector_type == "test" else dataset.get_train_dl(shuffle=False)
-        self.print_msg("Getting %s Dataloader" % vector_type)
+        print_msg("Getting %s Dataloader" % vector_type)
 
         learnt_reprs = []
         preds = []
@@ -186,7 +186,7 @@ class SequenceTrainer(BaseTrainer):
         scores.update({"%s loss" % running_mode: 0})
         end_time = time.time()
         time_needed = end_time - start_time
-        self.print_msg("Time Elapsed: %s" % str(datetime.timedelta(seconds=time_needed)).split(".")[0])
+        print_msg("Time Elapsed: %s" % str(datetime.timedelta(seconds=time_needed)).split(".")[0])
         json_list = []
         assert len(learnt_reprs) == len(preds)
         for i in range(len(learnt_reprs)):
@@ -194,7 +194,7 @@ class SequenceTrainer(BaseTrainer):
             json_list.append(tmp_dict)
         reprs_path = os.path.join(self.config.output_path, "%s_%s_reprs.json" % (vector_type, self.model.name))
         save_json(json_list, reprs_path)
-        self.print_msg("Representation saved to %s" % reprs_path)
+        print_msg("Representation saved to %s" % reprs_path)
         return scores
 
     def save_classify_output(self, results):
@@ -215,4 +215,26 @@ class SequenceTrainer(BaseTrainer):
         #             wfile.write("Target: %i \n" % target)
         #             wfile.write("=================================================================\n")
         #             count += 1
-        self.print_msg("Classification Output saved to %s" % output_path)
+        print_msg("Classification Output saved to %s" % output_path)
+
+    def get_embedding_from_clone(self,dataset):
+        test_dl = dataset.get_testing_dl()
+        # Get result only
+        embs = []
+        with torch.no_grad():
+            for iter_num, batch_dict in tqdm(enumerate(test_dl)):
+                self.model.eval()
+                func_one_embs = self.model.get_func_one_emb(batch_dict)
+                func_one_embs = func_one_embs.cpu().detach().numpy()
+                embs.extend(func_one_embs)
+        return embs
+
+    def get_embedding_from_classification(self,data_loader):
+        embs = []
+        with torch.no_grad():
+            for iter_num, batch_dict in tqdm(enumerate(data_loader)):
+                self.model.eval()
+                func_embs = self.model.get_embedding(batch_dict)
+                func_embs = func_embs.cpu().detach().numpy()
+                embs.extend(func_embs)
+        return embs

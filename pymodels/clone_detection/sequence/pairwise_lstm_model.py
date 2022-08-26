@@ -89,3 +89,11 @@ class PairwiseLSTMModel(nn.Module):
         last_seq_idxs = torch.tensor([x - 1 for x in fn_len], dtype=torch.long)
         last_seq_items = outputs[range(outputs.shape[0]), last_seq_idxs, :]
         return last_seq_items
+
+    def get_func_one_emb(self,batch_dict):
+        # Function one
+        packed_fnone_src, fnone_len = self.get_packed_function(batch_dict, 'fn_one_tensors', 'funcs_one_lens')
+
+        # Function one LSTM
+        fnone_last_items = self.get_last_lstm_output(packed_fnone_src, fnone_len, self.encoder_one)
+        return fnone_last_items

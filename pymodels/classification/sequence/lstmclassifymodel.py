@@ -68,3 +68,17 @@ class LSTMClassifyModel(nn.Module):
             loss = loss_fn(dense_output, tgt)
         sm_mask_output = F.softmax(dense_output, dim=-1)
         return sm_mask_output, class_target, loss
+
+    def get_embedding(self,batch_dict):
+        class_target = batch_dict['tgt']
+        fn_tensors = to_cuda(batch_dict['fn_tensors'], use_cuda=self.use_cuda)
+        fn_len = batch_dict['funcs_lens']
+        embed_fn = self.embedding(fn_tensors)
+        # Output = [bsz,  max token num, word emb dim]
+        packed_src = pack_padded_sequence(embed_fn, fn_len,
+                                          batch_first=True, enforce_sorted=False)
+        outputs, (hidden, cell) = self.encoder(packed_src)
+        outputs, input_sizes = pad_packed_sequence(outputs, batch_first=True)
+        last_seq_idxs = torch.tensor([x - 1 for x in fn_len], dtype=torch.long)
+        last_seq_items = outputs[range(outputs.shape[0]), last_seq_idxs, :]
+        return last_seq_items

@@ -24,7 +24,7 @@ use_scheduler: True
 class_weight: True
 mm_var: "weighted_accuracy" # Main Monitor Variable/Main Metric Variable
 monitor_vars: ["weighted_accuracy"]
-gpu_id: 0
+gpu_id: 3
 
 # Generic Model Hyperparameters
 max_code_token_len: 20

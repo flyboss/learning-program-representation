@@ -81,3 +81,8 @@ class PairwiseGGNNModel(nn.Module):
         g.ndata['h'] = h
         mean_feats = graph_readout(g, self.graph_config['graph_agg'])
         return mean_feats
+
+    def get_func_one_emb(self,batch_dict):
+        # Function one
+        fnone_mean_feats = self.get_ggnn_feats(batch_dict['graphs_one'], self.fnone_g_conv, self.batch_norm_one)
+        return fnone_mean_feats

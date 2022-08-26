@@ -29,8 +29,7 @@ class ModelFactory:
     @staticmethod
     def get_model(config):
         if config.task_type == TaskType.Classification and config.task in [Task.VulnerabilityDetection,
-                                                                           Task.CodeClassification,
-                                                                           Task.PatchIdentification]:
+                                                                           Task.CodeClassification]:
             if config.model_type in [ModelType.XGBoost]:
                 return XGBoostModel
             elif config.model_type in [ModelType.SVM]:

@@ -59,7 +59,7 @@ class PairwiseTransformerModel(nn.Module):
         fntwo_src, fntwo_len, fntwo_src_pad = self.get_function_ts(batch_dict, 'fn_two_tensors', 'funcs_two_lens')
 
         fnone_last_items = self.get_last_lstm_output(fnone_src, fnone_len, fnone_src_pad, self.transformer_encoder_one)
-        fntwo_last_items = self.get_last_lstm_output(fnone_src, fnone_len, fnone_src_pad, self.transformer_encoder_two)
+        fntwo_last_items = self.get_last_lstm_output(fntwo_src, fntwo_len, fntwo_src_pad, self.transformer_encoder_two)
 
         euc_dist = (fnone_last_items - fntwo_last_items) ** 2
         dense_output = F.leaky_relu(self.fforward(euc_dist))

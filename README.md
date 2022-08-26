@@ -31,3 +31,60 @@ If you find this repository useful in your research, please consider citing it:
   year={2022}
 }
 ```
+
+
+# dataset
+test dataset : json list, len == 5000
+```json
+[
+  {
+    'item_1': {'function_id': '1','jsgraph': {'graph': [[1,2,0],...],'function': ''}},
+    'item_2': {},
+    'target': 1/0
+    
+  }
+]
+```
+
+## POJ104
+
+```json
+[
+  {
+    "function_id": "str",
+    "target": "int",
+    "jsgraph": {
+      "graph": [
+        [
+          1,
+          2,
+          0
+        ]
+      ],
+      "node_features":{ "0": ["Function","","0","False"]
+      }
+    },
+    "jsgraph_file_path":"str",
+    "function": "str",
+    "graph_size":"int",
+    "cfile_path":"str"
+  }
+]
+```
+
+# load dataset steps（以Tree-LSTM为例）
+* DatasetFactory().get_dataset(config)
+* dataloader = POJ104
+* BaseDataset
+  * 定义 self.dataformatter = FormatterFactory().get_formatter(self.config)
+    * TreeLSTMFormatter
+    * 在BaseFormatter中，定义collate_fn:collate_graph_for_classification
+  * 从gzip导入json数据 train/val/test load from json
+  * self.format_data()
+  * self._format(train/val/test)
+  * datapoints.append(self.dataformatter.format(item, self.get_vocabs()))
+
+# trained_model
+## code_classification
+### treelstm
+20220727-163602: textual

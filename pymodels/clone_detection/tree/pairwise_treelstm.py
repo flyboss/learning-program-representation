@@ -81,3 +81,8 @@ class PairwiseTreeLSTMModel(nn.Module):
         g.ndata['h'] = h
         mean_feats = graph_readout(g, self.graph_config['graph_agg'])
         return mean_feats
+
+    def get_func_one_emb(self,batch_dict):
+        # Function one
+        fnone_mean_feats = self.treelstm_layer(batch_dict['graphs_one'], self.cell_one)
+        return fnone_mean_feats

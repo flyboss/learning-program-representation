@@ -38,7 +38,7 @@ dropout: 0.2
 self_loop: True
 reverse_edge: True
 use_edge_type: cpg # ast, cfg, cdg, ddg, and cpg
-gpu_id: 0
+gpu_id: 3
 
 # Node Embedding Layer
 node_emb_layer:

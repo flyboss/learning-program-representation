@@ -18,6 +18,7 @@ from configs.config import Config
 from factory.dataset_factory import DatasetFactory
 from factory.trainer_factory import TrainerFactory
 from utils.util import *
+from pprint import pprint
 
 
 def main(arguments):
@@ -45,3 +46,9 @@ def main(arguments):
 if __name__ == "__main__":
     args = docopt(__doc__)
     main(args)
+    # path = 'data/poj104/train.gzip'
+    # with gzip.open(path, 'r') as fin:
+    #     json_bytes = fin.read()
+    # json_str = json_bytes.decode('utf-8')
+    # objs = json.loads(json_str)
+    # print(objs[0]['function'])

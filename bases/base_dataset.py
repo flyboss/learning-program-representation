@@ -9,7 +9,7 @@ from utils.util import load_json, load_gzip_as_json, is_tfidf
 
 
 class BaseDataset:
-    def __init__(self, name, config, running_mode):
+    def __init__(self, name, config, running_mode, is_snippet=False):
         """
         Base Class for Dataset
         """
@@ -24,10 +24,17 @@ class BaseDataset:
         train_path = os.path.join(config.dataset['path'], 'train.gzip')
         val_path = os.path.join(config.dataset['path'], 'val.gzip')
         test_path = os.path.join(config.dataset['path'], 'test.gzip')
-        if running_mode == "train":
+        if is_snippet:
+            test_path = os.path.join(config.dataset['path'], 'test_snippet.gzip')
+
+        if self.running_mode == "train":
             self.train_jsons = self._load_data_from_json(train_path, gzip_format=True)
             self.val_jsons = self._load_data_from_json(val_path, gzip_format=True)
-        if running_mode == "test" or self.is_tfidf():
+        if self.running_mode == "test" or self.is_tfidf():
+            self.test_jsons = self._load_data_from_json(test_path, gzip_format=True)
+        if self.running_mode == "all":
+            self.train_jsons = self._load_data_from_json(train_path, gzip_format=True)
+            self.val_jsons = self._load_data_from_json(val_path, gzip_format=True)
             self.test_jsons = self._load_data_from_json(test_path, gzip_format=True)
         self.train_datapoints, self.val_datapoints, self.test_datapoints = [], [], []
         self.format_data()
@@ -70,6 +77,10 @@ class BaseDataset:
             self.train_datapoints = self._format(self.train_jsons)
             self.val_datapoints = self._format(self.val_jsons)
         if self.running_mode == "test" or self.is_tfidf():
+            self.test_datapoints = self._format(self.test_jsons)
+        if self.running_mode == "all":
+            self.train_datapoints = self._format(self.train_jsons)
+            self.val_datapoints = self._format(self.val_jsons)
             self.test_datapoints = self._format(self.test_jsons)
 
     def set_class_weights(self):
@@ -122,8 +133,11 @@ class BaseDataset:
         collate_fn = CollateFactory().get_collate_fn(self.config)
         assert self.train_datapoints is not None
         assert self.val_datapoints is not None
+        # train_dl = self._set_datapoints_dataloader(self.train_datapoints,
+        #                                            collate_fn, shuffle=False)
+        # 为了方便我们对train数据集的code embedding，改成了shuffle=False
         train_dl = self._set_datapoints_dataloader(self.train_datapoints,
-                                                   collate_fn, shuffle=True)
+                                                   collate_fn, shuffle=False)
         val_dl = self._set_datapoints_dataloader(self.val_datapoints,
                                                  collate_fn, shuffle=False)
         return train_dl, val_dl
@@ -139,7 +153,7 @@ class BaseDataset:
         test_dl = self._set_datapoints_dataloader(self.test_datapoints, collate_fn, shuffle=False)
         return test_dl
 
-    def get_train_dl(self, shuffle=True):
+    def get_train_dl(self, shuffle):
         """
         Get the training data loader
         :return: Return data loader
